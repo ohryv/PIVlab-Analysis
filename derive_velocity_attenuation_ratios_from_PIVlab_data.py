@@ -64,12 +64,12 @@ def break_down_data(filename):
     String xcol, ycol, ucol, vcol = the names of the columns with the x coordinate, y coordinate, u-component of velocity, and v-component of 
     velocity, respectively. Allows generalizability with calibrated and noncalibrated data.
     int col_len = the number of data points
-    vec_dist = the distance between each vector data point
-    int xmin, xmax = maximum and minimum x values in the ORIGINAL data
-    Numpy Array xrange = A numpy arange array of all x data. Does not correspond to image coordinates or the max/min
-    int ymin, ymax = maximum and minimum y values in the ORIGINAL data
-    Numpy Array yrange = A numpy arange array of all y data. Does not correspond to image coordinates or the max/min
-    Numpy 2D Array xy = An array that creates a grid with exactly as many entries as there will be data points
+    float vec_dist = the distance between each vector data point
+    float xmin, xmax = maximum and minimum x values in the ORIGINAL data
+    Numpy Array xrange = A numpy arange array of all unique x-values in the original data
+    float ymin, ymax = maximum and minimum y values in the ORIGINAL data
+    Numpy Array yrange = A numpy arange array of all unique y-values in the original data
+    Numpy 2D Array xy = An array that represents how data will be reconstructed into a heatmap image
     '''
 
     data = pd.read_csv(filename)
@@ -195,8 +195,7 @@ def velocity_attenuation_heatmap(filename, left, right, bott, top, output_title 
     Returns a heatmap of velocity attenuation compared to a defined free-stream area for an individual frame.
     Compares the *magnitude of the velocity.*
 
-    Also draws a rectangle of the defined free stream area over the plot. If you are working with the very boundary of the image, add one pixel to 
-    make sure the box shows up properly (i.e. image ends on pixel 800, put right as 801 for the right bound) 
+    Also draws a rectangle of the defined free stream area over the plot.
 
     Parameters:
     String filename: path of file for analysis
@@ -284,8 +283,7 @@ def timeavg_velocity_attenuation_heatmap(filename, start_frame, end_frame, left,
     averages over the number of available data and returns a heatmap of the amount of available data for each pixel to display where more data may
     have been missing.
 
-    Also draws a rectangle of the defined free stream area over the plot. If you are working with the very boundary of the image, add one pixel to 
-    make sure the box shows up properly (i.e. image ends on pixel 800, put right as 801 for the right bound) 
+    Also draws a rectangle of the defined free stream area over the plot.
 
     Parameters:
     String filename: path of file for analysis UNTIL THE STRING OF NUMBERS THAT DENOTES FRAME NUMBER
@@ -584,6 +582,8 @@ def timeavg_small_area_attenuation_rad(filename, start_frame, end_frame, px, py,
     float ft = literally "free stream top", top (highest y value) coordinate of the free stream region
 
     int rad: How many vectors out from the center of the region of interest are we going? Make sure to not make this too large, and pls don't put 0.
+    (optional) int digits: Default = 4. The string of numbers at the end of your file names should not be included in filename. How many 'digits' 
+    are there of the string of numbers at the end? i.e, for file data_0001, digits=4. For file data_001, digits=3.
 
     Returns:
     float attenuation = the velocity attenuation ratio between the mean magnitude of velocity of the ROI and the mean magnitude of velocity of 
