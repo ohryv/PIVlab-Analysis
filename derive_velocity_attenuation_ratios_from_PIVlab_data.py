@@ -274,7 +274,7 @@ def velocity_attenuation_heatmap(filename, left, right, bott, top, output_title 
 
     plt.savefig(output_title)
     plt.show()
-    return mag_attenuation
+    return mag_attenuation, fig
 
 def timeavg_velocity_attenuation_heatmap(filename, start_frame, end_frame, left, right, bott, top, digits = 4, output_title = "Output/velocityattenuationheatmap.png"):
     '''
@@ -408,7 +408,7 @@ def timeavg_velocity_attenuation_heatmap(filename, start_frame, end_frame, left,
     plt.savefig(output_title)
     plt.show()
     
-    return mag_attenuation
+    return mag_attenuation, fig, axes
 
 def small_area_attenuation_rect(filename, pl, pr, pb, pt, fl, fr, fb, ft):
     '''
