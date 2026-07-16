@@ -13,13 +13,14 @@ def about():
 
     For data analysis by the user:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    velocity_attenuation_heatmap(String filename, float left, float right, float bott, float top)--- Returns a heatmap of the velocity attenuation 
-    ratio for *one* frame of PIVlab data, as well as a list of the attenuation values for each pixel in the same order as the input data. Must define
-    the free stream region.
+    velocity_attenuation_heatmap(String filename, float left, float right, float bott, float top, output_title = "Output/velocityattenuationheatmap.png", 
+    return_nums_only = False, return_as_dataframe = False)--- Returns a heatmap of the velocity attenuation ratio for *one* frame of PIVlab data, as 
+    well as a list of the attenuation values for each pixel in the same order as the input data. Must define the free stream region.
 
     timeavg_velocity_attenuation_heatmap(String filename, int start_frame, int end_frame, float left, float right, float bott, float top, 
-    int digits = 4)--- Returns a time-averaged heatmap of the velocity attenuation ratio from PIVlab data, as well as a 1D Numpy array of the 
-    time-averaged attenuation values for each pixel in the same order as the input data. Must define a free stream region that is constant in time.
+    int digits = 4, output_title = "Output/velocityattenuationheatmap.png", return_nums_only = False, return_as_dataframe = False)--- 
+    Returns a time-averaged heatmap of the velocity attenuation ratio from PIVlab data, as well as a 1D Numpy array of the time-averaged attenuation 
+    values for each pixel in the same order as the input data. Must define a free stream region that is constant in time.
     Arguably the most useful function in this whole set of data.
 
     small_area_attenuation_rect(String filename, floats pl, pr, pb, pt, fl, fr, fb, ft)--- Returns the mean value of the velocity attenuation ratio
@@ -190,7 +191,7 @@ def draw_heatmap(array, title, diverging = True, normalized = False):
     plt.title(title)
     plt.tight_layout(pad=2.0)
 
-def velocity_attenuation_heatmap(filename, left, right, bott, top, output_title = "Output/velocityattenuationheatmap.png"):
+def velocity_attenuation_heatmap(filename, left, right, bott, top, output_title = "Output/velocityattenuationheatmap.png", return_nums_only = False, return_as_dataframe = False):
     '''
     Returns a heatmap of velocity attenuation compared to a defined free-stream area for an individual frame.
     Compares the *magnitude of the velocity.*
@@ -211,10 +212,17 @@ def velocity_attenuation_heatmap(filename, left, right, bott, top, output_title 
     These assume x increasing to the right and y increasing toward the bottom
 
     (optional, but highly recommended) String output_title: How should the output be labeled? Default: "Output/velocityattenuationheatmap.png"
+    (optional) Boolean return_nums_only: Only returns the Attenuation array, without the MatPlotLib Figure and Axes objects. Default: False
+    (optional) Boolean return_as_dataframe: Returns a Pandas DataFrame with columns X, Y, Average Magnitude, Velocity Attenuation Ratio
+    instead of a python list of just attenuation values. Default: False
 
     Returns:
     The heatmaps, duh
+    Depending on the values of return_nums_only and return_as_dataframe, returns one or more of the following:
     A 1D Numpy array mag_attenuation with the velocity attenuation ratios for each data point in the same order as the original data.
+    A Pandas DataFrame findata with columns xcol, ycol, 'Average Magnitude of Velocity' and 'Velocity Attenuation Ratio'
+    MatPlotLib Figure fig, the heatmap
+    MatPlotLib Axes ax, the axis of the figure
 
     Credit to Dr. Alison Weber for help debugging the box around the free stream
     '''
@@ -274,9 +282,20 @@ def velocity_attenuation_heatmap(filename, left, right, bott, top, output_title 
 
     plt.savefig(output_title)
     plt.show()
-    return mag_attenuation, fig
 
-def timeavg_velocity_attenuation_heatmap(filename, start_frame, end_frame, left, right, bott, top, digits = 4, output_title = "Output/velocityattenuationheatmap.png"):
+    if return_as_dataframe:
+        findata = data[[xcol, ycol]]
+        findata['Average Magnitude of Velocity'] = velmag
+        findata['Velocity Attenuation Ratio'] = mag_attenuation
+        if return_nums_only:
+            return findata
+        return findata, fig, ax
+    
+    if return_nums_only:
+        return mag_attenuation
+    return mag_attenuation, fig, ax
+
+def timeavg_velocity_attenuation_heatmap(filename, start_frame, end_frame, left, right, bott, top, digits = 4, output_title = "Output/velocityattenuationheatmap.png", return_nums_only = False, return_as_dataframe = False):
     '''
     Finds a heatmap of the velocity attenuation ratio from PIVlab data using a defined free stream region. This function takes this as a time
     average over a set amount of frames, averaging the velocities before deriving the attenuation value at the end. In the case of missing data, 
@@ -304,10 +323,17 @@ def timeavg_velocity_attenuation_heatmap(filename, start_frame, end_frame, left,
     (optional) int digits: Default = 4. The string of numbers at the end of your file names should not be included in filename. How many 'digits' are there 
     of the string of numbers at the end? i.e, for file data_0001, digits=4. For file data_001, digits=3.
     (optional, but highly recommended) String output_title: How should the output be labeled? Default: "Output/velocityattenuationheatmap.png"
+    (optional) Boolean return_nums_only: Only returns the Attenuation array, without the MatPlotLib Figure and Axes objects.
+    (optional) Boolean return_as_dataframe: Returns a Pandas DataFrame with columns X, Y, Average Magnitude, Velocity Attenuation Ratio
+    instead of a python list of just attenuation values. Default: False
 
     Returns:
     The heatmaps, duh
+    Depending on the values of return_nums_only and return_as_dataframe, returns one or more of the following:
     A 1D Numpy array mag_attenuation with the velocity attenuation ratios for each data point in the same order as the original data.
+    A Pandas DataFrame findata with columns xcol, ycol, 'Average Magnitude of Velocity' and 'Velocity Attenuation Ratio'
+    MatPlotLib Figure fig, the heatmaps
+    MatPlotLib Axes axes, the axes of the two figures
     '''
 
     # #Standard unpacking from other fns
@@ -407,7 +433,17 @@ def timeavg_velocity_attenuation_heatmap(filename, start_frame, end_frame, left,
     draw_heatmap(val_pts_arr, "Number of Valid (Non-Nan) Vectors For Each Pixel", normalized = False, diverging = False)
     plt.savefig(output_title)
     plt.show()
+
+    if return_as_dataframe:
+        findata = data[[xcol, ycol]]
+        findata['Average Magnitude of Velocity'] = mag_avg
+        findata['Velocity Attenuation Ratio'] = mag_attenuation
+        if return_nums_only:
+            return findata
+        return findata, fig, axes
     
+    if return_nums_only:
+        return mag_attenuation
     return mag_attenuation, fig, axes
 
 def small_area_attenuation_rect(filename, pl, pr, pb, pt, fl, fr, fb, ft):
