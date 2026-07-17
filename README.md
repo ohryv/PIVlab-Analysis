@@ -6,6 +6,6 @@ HowManyVectorsAreReal-- Working notebook for finding VDP (valid detection probab
 validate-and-plot-validations-PIVlab-- Finalized .py file of HowManyVectorsAreReal
 ___________________________________________________________________________________________________________________________________________________
 
-VelocityAttenuation_WorkingNotebook_FinalDraft-- Jupyter notebook with the finalized code for evaluating the velocity attenuation ratio in a small region and across an entire analyzed PIVlab frame.
+VelocityAttenuation_WorkingNotebook_FinalDraft-- Working notebook for evaluating the velocity attenuation ratio in a small region and across an entire analyzed PIVlab frame.
 
 derive_velocity_attenuation_ratios_from_PIVlab_data-- Finalized .py file of VelocityAttenuation_WorkingNotebook_FinalDraft
